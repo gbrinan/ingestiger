@@ -9,6 +9,8 @@
 | `config/agents/ingestiger/meta.json` | `agent/meta.json` | 그대로 복사 |
 | `config/agents/ingestiger/role-directive.md` | `agent/role-directive.md` | 그대로 복사 |
 | `config/agents/ingestiger/skills/SKILL.md` | `skills/ingestiger/SKILL.md` | 그대로 복사 (role-directive가 "skills/ingestiger/SKILL.md"로 참조하므로 상대 경로 유지) |
+| `config/agents/ingestiger/skills/references/` | `skills/ingestiger/references/` | 복구 체인 참조 문서 |
+| `config/agents/ingestiger/skills/scripts/` | `scripts/` | 게이트 검사기 6종 (sniff·qualgate·ledger·idem·piiscan·verguard) — SKILL.md가 경로로 참조 |
 | `history/skills/index.md` (스킬-알바 라우팅 표) | — | 1행 추가: `ingestiger \| 다포맷 원본을 코퍼스로 적재 \| ingestiger \| 인제스트, 적재, 코퍼스, RAG, hwp, pdf` |
 
 `ingest-crab`은 당분간 나란히 두고, 인제스트타이거가 배치 3회 이상 게이트를 통과하면

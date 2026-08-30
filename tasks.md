@@ -54,7 +54,14 @@ Phase 7 — 실배치 검증과 v0.2.0 (진행 중: 미해결 3건 리서치 대
   - [x] 격리 표본 복구 체인 실증 → 글리프 부재 확정, quarantine/ 사유서·래스터 보존
   - [x] 소비자 QA: 맥락 0 에이전트 4/4 정답+출처, 함정 문항 부재 판정, 환각 0
   - [x] SKILL.md v0.3.0: 적재 단계 노드 생성 의무화
-  - [ ] v0.3.0 태그·push, soloforce2 재복사
+  - [x] v0.3.0 태그·push (a474a43), soloforce2 재복사
+- [ ] **Phase 9 — 게이트 스크립트화·미러 실증 (v0.4.0)**
+  - [x] scripts/ 6종(sniff·qualgate·ledger·idem·piiscan·verguard) 실데이터 합격 (progress 세션 4)
+  - [x] golden.md 스모크 정본 신설
+  - [x] 드라이브 미러 21/21 실증 (ingestiger-mirror/, 격리 제외 규정 적용)
+  - [x] SKILL.md 스크립트 배선 + "산출물을 고치지 스크립트를 고치지 않는다" 규칙
+  - [ ] v0.4.0 태그·push, soloforce2 재복사
+  - [ ] (다음) soloforce2 런타임 검증 — v2 안에서 소형 배치 1건, corpus-gates.md 실재 확인
 
 ## 결정 기록
 
