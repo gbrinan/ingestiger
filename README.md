@@ -22,8 +22,9 @@ soloforce의 `ingest-crab`(인제스트크랩)을 [paperthin](https://github.com
 
 ## 설계 원칙 (paperthin에서)
 
-- **Trust the artifact, not the author** — 배치는 정산(발견=적재+실패+건너뜀)과 역추적
-  3건이 맞아야 끝난다. 만든 세션의 자신감은 증거가 아니다.
+- **Trust the artifact, not the author** — 배치는 정산(발견=적재+실패+건너뜀+격리+보류),
+  역추적 3건, 문서별 스모크 질의가 맞아야 끝난다. 변환기의 성공 종료 코드도, 만든 세션의
+  자신감도 증거가 아니다.
 - **자기완결 + SSOT** — 스킬 하나만 설치해도 돌아가고, 도구명은 "바뀌면 여기만 고친다"
   표 한 곳, 버전은 meta.json 한 곳에만 산다.
 - **negatives-as-corpus** — 실패·건너뜀 목록은 지우지 않는다. 다음 배치의 훈련 데이터다.
@@ -33,14 +34,17 @@ soloforce의 `ingest-crab`(인제스트크랩)을 [paperthin](https://github.com
 
 ```
 원본 (읽기 전용)
-   │  변환: docling / kordoc(HWP) / faster-whisper(wav)   ← 라우팅 표는 SKILL.md가 정본
+   │  판별: 확장자가 아니라 매직바이트
+   │  변환: kordoc(한국 문서·OCR) / markitdown / faster-whisper(wav)  ← 라우팅 표는 SKILL.md가 정본
+   │  품질 게이트: 깨진 글리프·저신뢰 OCR/STT → 격리(quarantine/)
    ▼
-로컬 정본  <기준 폴더>/ingestiger/{index.md, updates.md, md/, meta/}
-   │           └ 사람이 폴더만 열어도 무엇이 들어왔는지 보인다 (위키형 색인)
-   ├─ (지시 시) 구글 드라이브 미러 — 정본 구조 그대로
-   ├─ (지시 시) 선택 DB 미러 — 코퍼스 스키마, 청크 500~1000자
+로컬 정본  <기준 폴더>/ingestiger/{index.md, updates.md, md/, quarantine/, meta/}
+   │           ├ 사람이 폴더만 열어도 무엇이 들어왔는지 보인다 (위키형 색인)
+   │           └ 민감 자동 스캔 → 플래그는 보류(사람 판정 대기), 확정은 사람
+   ├─ (지시 시) 구글 드라이브 미러 — 정본 구조 그대로 (보류·격리 제외)
+   ├─ (지시 시) 선택 DB 미러 — 코퍼스 스키마 (청킹은 적재와 동일 규칙)
    ▼
-코퍼스/RAG 적재 → 검증(역추적 3건 + 실질의) → 보고
+코퍼스/RAG 적재(구조 청크 우선) → 검증(역추적 3건 + 문서별 스모크 질의) → 보고
 ```
 
 ## 버전

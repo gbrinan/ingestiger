@@ -12,7 +12,7 @@ soloforce의 `ingest-crab` 에이전트를 **paperthin 철학**(Trust the artifa
 
 ## 현재 단계
 
-Phase 6 — 배포·연동 (진행 중: push·태그까지 완료, Soloforce2 반영은 다음 세션)
+Phase 7 — 실배치 검증과 v0.2.0 (진행 중: 미해결 3건 리서치 대기)
 
 ## 단계
 
@@ -37,10 +37,18 @@ Phase 6 — 배포·연동 (진행 중: push·태그까지 완료, Soloforce2 �
 - [x] **Phase 5 — 검증**
   - [x] 콜드리드(shower식): 판정 "손질 필요" → 지적 반영 후 정산·색인·미러 검증 정합 (progress.md 표)
   - [x] 정산 게이트 자기검증: 발견 = 적재 + 실패 + 건너뜀 규칙이 스킬 안에서 모순 없는가
-- [ ] **Phase 6 — 배포·연동**
+- [x] **Phase 6 — 배포·연동**
   - [x] Soloforce2 연동 가이드(`docs/soloforce2-integration.md`) 작성 — 버전 고정 방식 포함
-  - [ ] main에 커밋·push, v0.1.0 태그
-  - [ ] Soloforce2 로컬(`C:\Users\user\Documents\soloforce2`)에 config/agents/ingestiger 반영 (다음 세션)
+  - [x] main에 커밋·push, v0.1.0 태그 (96f6e1d)
+  - [x] Soloforce2 로컬(`C:\Users\user\Documents\soloforce2`)에 config/agents/ingestiger 복사 (미커밋)
+- [ ] **Phase 7 — 실배치 검증과 v0.2.0**
+  - [x] first_nail: 다운로드 폴더 포맷별 대표 14건 실배치 (findings.md §6, 정산 14=9+4+1)
+  - [x] 보강 리서치 5건 도출 (findings.md §7)
+  - [x] SKILL.md v0.2.0 재작성: 매직바이트 판별·품질 게이트·격리/보류 버킷·멱등성·
+        스모크 질의·STT 신뢰도 게이트·구조 청크·라우팅 표 재편(kordoc 우선)
+  - [x] 미해결 리서치 3건 완료 → `skills/ingestiger/references/recovery-chains.md` 신설,
+        라우팅 표에 접합 (findings.md §7)
+  - [ ] v0.2.0 태그·push, soloforce2 재복사
 
 ## 결정 기록
 

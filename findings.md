@@ -189,3 +189,46 @@ description: "<트리거가 풍부한 한 줄>"
 - 버전 규약 부재(meta.json version 없음, CHANGELOG 없음) → **이 레포가 버전 정본**(D4).
   soloforce2의 `.re0/iteration/{semver-slug}/` 관례와는 별개.
 - 로컬 작업본: `C:\Users\user\Documents\soloforce2` (브랜치 v0-final = 원격 main).
+
+## 6. v0.1.0 실배치 검증 (2026-08-31, 다운로드 폴더 포맷별 대표 14건)
+
+`hate`의 first_nail("문서 정합 ≠ 작동") 실행 결과. 정산: 발견 14 = 적재 9 + 실패 4 + 건너뜀 1.
+역추적 3건·스모크 질의 전부 적중. 로컬 정본: `C:\Users\user\Documents\ingestiger-corpus\ingestiger\`.
+
+스킬을 실제로 죽이거나 다치게 한 것들 (전부 v0.2.0에 반영):
+
+- **성공 코드로 위장한 쓰레기 변환**: CMap 손상 한국어 pdf가 kordoc 기본·`--ocr-force`·
+  markitdown 모두에서 "성공" 종료 후 전 한글이 `nn`/탈락. 품질 게이트 없으면 색인·검색까지
+  됐을 것 — "검색된다≠맞다"의 실물 표본. → 품질 게이트 + 격리 버킷.
+- **확장자 위장 2건**: .png의 실체가 XML, .doc의 실체가 Confluence MHTML.
+  → 매직바이트 판별을 수집 단계에.
+- **민감 게이트 실발화**: 정산 xlsx에서 제3자 가맹점 실명·가맹점키·지급액 발견 → 건너뜀.
+  수동 검수로 잡음 — 배치 50건이면 눈이 뚫림. → 자동 스캔 + 보류 버킷.
+- **wav 무발화**(0.77s, 세그먼트 0): "전사 성공"과 "내용 존재"의 분리.
+  → STT 신뢰도(avg_logprob·no_speech_prob) 게이트 + mm:ss 좌표.
+- **하이브리드 저장소의 죽은 축**: opencrab `query_bm25` 단독 인덱스 크기 0 —
+  ingest는 벡터·문서 스토어에만 반영. 스모크 질의가 아니었으면 발견 불가.
+  → 문서별 스모크 질의를 검증 게이트로, 축별 확인 규칙.
+- **도구 사실 정정**: kordoc은 hwp/hwpx 전용이 아니라 pdf·docx·xlsx·png(내장 한국어
+  OCR)·`--format chunks`(구조 청크)까지 담당 — 한국 문서 우선 경로로 라우팅 표 재편.
+  docling은 이 배치에서 불필요했음(무거운 설치 대비). 레거시 .doc은 툴체인 공백.
+
+## 7. 보강 리서치 (2026-08-31, GitHub·웹 — 상세 출처는 progress.md 세션 2)
+
+v0.2.0에 반영된 근거: LlamaIndex docstore 전략(doc_id→hash, upsert)=멱등성,
+docling confidence grades=품질 게이트·격리, Unstructured/docling=구조 인지 청킹 우위,
+Qdrant/Google Cloud=골든 질문 스모크 평가, whisper 계열 신뢰도 필드=STT 게이트,
+Presidio 계열=미러 전 PII 레인(한국형 인식기 필요), dev.to "ingestion drift"=변환기
+버전을 skip 조건에 포함.
+
+미해결 3건 추가 리서치 완료(2026-08-31, GitHub·웹 — Reddit은 크롤러 차단으로 접근 불가):
+- (a) CMap 손상 pdf: pdfium 두부(tofu) 렌더가 원인 확정 — pdf-fix-tuc → Ghostscript
+  cidfmap 재래스터화 → PaddleOCR PP-OCRv5 korean(CPU, 88%) 체인. 전 단계 실패 시
+  결정적 복구 불가 → 격리가 정답.
+- (b) 레거시 doc: OLE2 매직바이트 판별 → soffice headless 배치(행 위험 → 타임아웃+출력
+  검증, 종료 코드 불신) → pandoc gfm. MHTML은 email 파서 → pandoc. antiword/wvWare 사멸.
+- (c) 한국형 PII: presidio가 KR_RRN·KR_FRN·KR_BRN·면허·여권 5종 내장(이관된
+  data-privacy-stack 배포판). 핵심 제도 사실 2건 — 주민번호 2020-10 이후 랜덤화로
+  체크섬 무효, 법인번호 2025-01-31 이후 무체크섬 → 체크섬은 가산만. NER은
+  KoELECTRA-small-v3-modu-ner(14M, CPU).
+정본: `skills/ingestiger/references/recovery-chains.md` (라우팅 표가 참조).
