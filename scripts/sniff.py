@@ -21,7 +21,8 @@ TEXT_HINTS = [(b"MIME-Version", "mhtml"), (b"<?xml", "xml"), (b"{\\rtf", "rtf")]
 EXT_OK = {  # 실제형식 -> 허용 확장자
     "pdf": {"pdf"}, "png": {"png"}, "jpg": {"jpg", "jpeg"},
     "docx": {"docx"}, "xlsx": {"xlsx"}, "pptx": {"pptx"}, "hwpx": {"hwpx"},
-    "ole2-hwp": {"hwp"}, "ole2": {"doc", "xls", "ppt", "hwp"},
+    "ole2-hwp": {"hwp"}, "ole2-doc": {"doc"}, "ole2-xls": {"xls"}, "ole2-ppt": {"ppt"},
+    "ole2": {"doc", "xls", "ppt", "hwp"},  # 하위 스트림 판별 실패 시의 느슨한 폴백
     "wav": {"wav"}, "text": {"md", "txt", "csv"}, "mhtml": {"mht", "mhtml"},
     "xml": {"xml"}, "rtf": {"rtf"}, "zip": {"zip"},
 }
@@ -32,27 +33,65 @@ def sniff(path):
     for sig, kind in SIGS:
         if head.startswith(sig):
             if kind == "zip":
-                for hint, sub in ZIP_HINTS:
+                # 앞 64KB만 보면 임베디드 미디어가 앞선 문서에서 세부 판별이 실패한다.
+                # zip 목차를 읽어 확정하고, 목차를 못 읽을 때만 바이트 힌트로 물러선다.
+                sub = _zip_subtype(path)
+                if sub:
+                    return sub
+                for hint, s in ZIP_HINTS:
                     if hint in head or hint in _more(path):
-                        return sub
+                        return s
                 return "zip"
             if kind == "riff":
                 return "wav" if head[8:12] == b"WAVE" else "riff"
             if kind == "ole2":
-                return "ole2-hwp" if b"HWP Document" in _more(path) else "ole2"
+                # OLE2는 doc/xls/ppt/hwp 공통 껍데기다. 하위 스트림으로 구분하지 않으면
+                # xls를 .doc으로 위장해도 통과해 잘못된 변환기로 라우팅된다.
+                blob = _more(path)
+                if b"HWP Document" in blob:
+                    return "ole2-hwp"
+                if b"W\x00o\x00r\x00k\x00b\x00o\x00o\x00k" in blob or b"Workbook" in blob:
+                    return "ole2-xls"
+                if b"PowerPoint Document" in blob:
+                    return "ole2-ppt"
+                if b"WordDocument" in blob or b"W\x00o\x00r\x00d\x00D\x00o\x00c" in blob:
+                    return "ole2-doc"
+                return "ole2"
             return kind
     for hint, kind in TEXT_HINTS:
         if hint in head[:256]:
             return kind
-    try:
-        head.decode("utf-8")
-        return "text"
-    except UnicodeDecodeError:
-        return "unknown"
+    # 한국 실무의 기본 인코딩(cp949/euc-kr)까지 텍스트로 인정한다 —
+    # utf-8만 시도하면 엑셀이 내보낸 한국어 CSV가 통째로 '형식 위장' 실패가 된다.
+    for enc in ("utf-8", "cp949", "euc-kr"):
+        try:
+            head.decode(enc)
+            return "text"
+        except (UnicodeDecodeError, LookupError):
+            continue
+    return "unknown"
 
 def _more(path):
     with open(path, "rb") as f:
         return f.read(65536)
+
+def _zip_subtype(path):
+    """zip 목차(전체 엔트리 목록)로 오피스 계열을 확정한다 — 엔트리 순서에 의존하지 않는다."""
+    try:
+        import zipfile
+        with zipfile.ZipFile(path) as z:
+            names = z.namelist()
+    except Exception:
+        return None
+    if any(n.startswith("word/") for n in names):
+        return "docx"
+    if any(n.startswith("xl/") for n in names):
+        return "xlsx"
+    if any(n.startswith("ppt/") for n in names):
+        return "pptx"
+    if any(n.startswith("Contents/") for n in names) or "settings.xml" in names and "version.xml" in names:
+        return "hwpx"
+    return None
 
 def main(argv):
     bad = 0

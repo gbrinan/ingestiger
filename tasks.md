@@ -60,7 +60,14 @@ Phase 7 — 실배치 검증과 v0.2.0 (진행 중: 미해결 3건 리서치 대
   - [x] golden.md 스모크 정본 신설
   - [x] 드라이브 미러 21/21 실증 (ingestiger-mirror/, 격리 제외 규정 적용)
   - [x] SKILL.md 스크립트 배선 + "산출물을 고치지 스크립트를 고치지 않는다" 규칙
-  - [ ] v0.4.0 태그·push, soloforce2 재복사
+  - [x] v0.4.0 태그·push (0c3b1a9), soloforce2 재복사
+- [ ] **Phase 10 — 적대 감사와 독립 검증 (v0.5.0)**
+  - [x] 신선 표본 재검증 + 맥락 0 적대 감사(누수 6패턴·결함 9건·hate root) 수령
+  - [x] 치명 2건 포함 결함 8건 수정, 전건 재현→수정→회귀 확인 (progress 세션 5)
+  - [x] manifest.py 신설 — 발견을 기계가 세고 ledger가 소스를 재나열해 대조
+  - [x] first_nail(침묵 누락) 실행 → 탐지 성공, root 반론 무력화
+  - [x] gates.sha256 봉인 + 0단계 무결성 확인, 스크립트 부재 시 배치 미시작 규정
+  - [ ] v0.5.0 태그·push, soloforce2 재복사
   - [ ] (다음) soloforce2 런타임 검증 — v2 안에서 소형 배치 1건, corpus-gates.md 실재 확인
 
 ## 결정 기록
