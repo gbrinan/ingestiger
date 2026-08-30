@@ -11,11 +11,19 @@
 | `config/agents/ingestiger/skills/SKILL.md` | `skills/ingestiger/SKILL.md` | 그대로 복사. role-directive는 에이전트 폴더 기준 `skills/SKILL.md`로 참조한다 — 레포와 호스트의 경로 깊이가 다르므로 이 대응을 바꾸면 참조가 끊긴다 |
 | `config/agents/ingestiger/skills/references/` | `skills/ingestiger/references/` | 복구 체인 참조 문서 |
 | `config/agents/ingestiger/skills/scripts/` | `scripts/` | 게이트 검사기 6종 (sniff·qualgate·ledger·idem·piiscan·verguard) — SKILL.md가 경로로 참조 |
-| `history/skills/index.md` (스킬-알바 라우팅 표) | — | 1행 추가: `ingestiger \| 다포맷 원본을 코퍼스로 적재 \| ingestiger \| 인제스트, 적재, 코퍼스, RAG, hwp, pdf` |
+**라우팅 표에 등록하지 않는다.** (2026-08-31 실측 정정) 인제스트타이거는 **에이전트**이고,
+에이전트는 `config/agents/<id>/meta.json`을 스캔해 자동 등록된다 — 폴더를 놓으면 그것이 등록이다.
+`history/skills/index.md`는 (a) **gitignore된 런타임 폴더**라 버전 관리 대상이 아니고,
+(b) 에이전트가 아니라 **스킬-알바**(`prompts/sub-agents/`에서 시딩되어 `Agent` 도구로 스폰되는
+재사용 서브에이전트)의 라우팅 표다. 둘은 다른 개념이므로 이 스킬은 그 표에 들어가지 않는다.
+
+meta.json 필수 필드는 기존 에이전트와 동일해야 한다: `id, name, jobTitle, team, adapter,
+model, isCore, permLevel, description`. 이 레포는 여기에 `version`·`supersedes`·`source`를
+더 싣는다(버전 정본이 이 레포이므로) — 추가 필드는 스캔에 영향을 주지 않는다.
 
 `ingest-crab`은 당분간 나란히 두고, 인제스트타이거가 배치 3회 이상 게이트를 통과하면
 ingest-crab을 은퇴시킨다 (paperthin negatives-as-corpus: 삭제가 아니라 보존 — 폴더는
-남기고 라우팅 표에서만 뺀다).
+남기고 폴더만 이동하거나 `isCore`/설명으로 은퇴를 표시한다).
 
 ## 버전 관리 (이 레포가 정본)
 

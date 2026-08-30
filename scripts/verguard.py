@@ -12,7 +12,10 @@ def hashes():
     out = {}
     for f in sorted(os.listdir(d)):
         if f.endswith(".py"):
-            out[f] = hashlib.sha256(open(os.path.join(d, f), "rb").read()).hexdigest()
+            raw = open(os.path.join(d, f), "rb").read()
+            # 줄바꿈을 정규화하고 해시한다: git이 체크아웃 환경에 따라 CRLF/LF를 바꾸므로,
+            # 정규화하지 않으면 내용이 같은데도 봉인이 깨졌다는 거짓 경보가 난다.
+            out[f] = hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest()
     return out
 
 def main(argv):
