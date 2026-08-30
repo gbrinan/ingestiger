@@ -48,7 +48,13 @@ Phase 7 — 실배치 검증과 v0.2.0 (진행 중: 미해결 3건 리서치 대
         스모크 질의·STT 신뢰도 게이트·구조 청크·라우팅 표 재편(kordoc 우선)
   - [x] 미해결 리서치 3건 완료 → `skills/ingestiger/references/recovery-chains.md` 신설,
         라우팅 표에 접합 (findings.md §7)
-  - [ ] v0.2.0 태그·push, soloforce2 재복사
+  - [x] v0.2.0 태그·push (1fdddbb), soloforce2 재복사
+- [ ] **Phase 8 — 그래프 축·격리·소비자 검증 (v0.3.0)**
+  - [x] ingest 시 노드 생성: 9건 백필 + 문법 전 경로 1건, BM25 0→13 (progress 세션 3)
+  - [x] 격리 표본 복구 체인 실증 → 글리프 부재 확정, quarantine/ 사유서·래스터 보존
+  - [x] 소비자 QA: 맥락 0 에이전트 4/4 정답+출처, 함정 문항 부재 판정, 환각 0
+  - [x] SKILL.md v0.3.0: 적재 단계 노드 생성 의무화
+  - [ ] v0.3.0 태그·push, soloforce2 재복사
 
 ## 결정 기록
 
