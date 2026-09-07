@@ -1,54 +1,39 @@
-# IngesTiger — 인제스트타이거
+# IngesTiger
 
-**원본 뭉치를 역추적 가능한 코퍼스로.**
-pdf · hwp/hwpx · doc/docx · md · txt · png · pptx · xlsx · csv · wav →
-마크다운 변환 → **로컬 정본** → (지시 시) **구글 드라이브 / 선택 DB 미러** → 코퍼스/RAG 적재.
+많은 문서를 기업·프로젝트별 LLM Wiki로 정리하고, 에이전트가 부서별 업무 니즈와 근거를 빠르게 찾도록 하는 스킬입니다.
 
-soloforce의 `ingest-crab`(인제스트크랩)을 [paperthin](https://github.com/LilMGenius/paperthin)
-철학으로 재설계한 후속 세대입니다. 핵심 전제는 그대로입니다:
+사실과 요구사항은 한 정본에 두고, 부서·도메인·공통 과제·활용 목적별 목차에서 참조합니다. 새 문서가 들어오면 출처와 변경 영향을 비교해 기존 지식에 반영합니다.
 
-> 검색된다는 것은 값이 맞다는 증거가 아니다.
-> 진척은 적재 건수가 아니라 **원본까지 되짚을 수 있는 값의 수**다.
+여러 기업의 비슷한 업무도 허용된 접근 범위 안에서 패턴별로 묶어 읽습니다. 각 기업의 세부 조건과 근거는 유지합니다. Wiki와 별도로 [ASCII ERD와 짧은 구성 요약](skills/ingestiger/references/structure.md)을 만듭니다.
 
-## 구성
+현재는 **개편 제안판**입니다. 실행 지침과 데이터 계약, 플러그인 폴더 구성을 제공합니다. 대량 자동 변환, 갱신 엔진, 다중 사용자 권한관리의 구현 완료를 뜻하지 않습니다.
 
-| 경로 | 내용 |
-|---|---|
-| [`skills/ingestiger/SKILL.md`](./skills/ingestiger/SKILL.md) | **절차의 정본.** 수직 루프 · 변환 라우팅 표 · 저장 계층 · 게이트 · 검증 |
-| [`agent/role-directive.md`](./agent/role-directive.md) | Soloforce2용 역할 지시서 (스킬을 정본으로 참조) |
-| [`agent/meta.json`](./agent/meta.json) | 에이전트 메타 + **version(semver) 정본** |
-| [`docs/soloforce2-integration.md`](./docs/soloforce2-integration.md) | Soloforce2 연동·버전 고정 가이드 |
-| `tasks.md` / `findings.md` / `progress.md` | 파일 기반 플래닝 워크플로 (계획 · 발견 · 로그) |
+- [개편 제안과 구현 순서](docs/proposal.md)
+- [역할 지시서](agent/role-directive.md)
+- [실행 스킬](skills/ingestiger/SKILL.md)
+- [기존 연동에서 전환하기](docs/soloforce2-integration.md)
+- [구조 결정](.agents/adr/0001-wiki-plugin.md)
 
-## 설계 원칙 (paperthin에서)
+저장 대상은 로컬 + Google Drive다. [두 저장소 계약](skills/ingestiger/references/storage.md)과 [기본 실행/Soloforce2 연동 설계](docs/soloforce2-integration.md)를 제공한다. Drive 쓰기·동기화와 호스트 통합은 아직 설계 단계다.
 
-- **Trust the artifact, not the author** — 배치는 정산(발견=적재+실패+건너뜀+격리+보류),
-  역추적 3건, 문서별 스모크 질의가 맞아야 끝난다. 변환기의 성공 종료 코드도, 만든 세션의
-  자신감도 증거가 아니다.
-- **자기완결 + SSOT** — 스킬 하나만 설치해도 돌아가고, 도구명은 "바뀌면 여기만 고친다"
-  표 한 곳, 버전은 meta.json 한 곳에만 산다.
-- **negatives-as-corpus** — 실패·건너뜀 목록은 지우지 않는다. 다음 배치의 훈련 데이터다.
-- **절제** — 지시 없는 폴더는 열지 않고, 배치 50을 넘기지 않고, 스키마를 만들거나 바꾸지 않는다.
+## 사용 예
 
-## 저장 파이프라인
+“이 문서 묶음을 A기업 B프로젝트의 Wiki로 정리하고, 디자인·마케팅의 공통 니즈를 보여줘.”
 
-```
-원본 (읽기 전용)
-   │  판별: 확장자가 아니라 매직바이트
-   │  변환: kordoc(한국 문서·OCR) / markitdown / faster-whisper(wav)  ← 라우팅 표는 SKILL.md가 정본
-   │  품질 게이트: 깨진 글리프·저신뢰 OCR/STT → 격리(quarantine/)
-   ▼
-로컬 정본  <기준 폴더>/ingestiger/{index.md, updates.md, md/, quarantine/, meta/}
-   │           ├ 사람이 폴더만 열어도 무엇이 들어왔는지 보인다 (위키형 색인)
-   │           └ 민감 자동 스캔 → 플래그는 보류(사람 판정 대기), 확정은 사람
-   ├─ (지시 시) 구글 드라이브 미러 — 정본 구조 그대로 (보류·격리 제외)
-   ├─ (지시 시) 선택 DB 미러 — 코퍼스 스키마 (청킹은 적재와 동일 규칙)
-   ▼
-코퍼스/RAG 적재(구조 청크 우선) → 검증(역추적 3건 + 문서별 스모크 질의) → 보고
-```
+“이 피드백을 기존 니즈에 대조해 변경안을 만들고, 교육과 서비스 명세에 미치는 영향을 알려줘.”
 
-## 버전
+“이 프로젝트의 SCM 요구사항과 원문 근거만 읽어 일반 에이전트용 맥락을 만들어줘.”
 
-`agent/meta.json`의 `version`이 정본이며 git tag `vX.Y.Z`와 일치합니다.
-판정은 크기가 아니라 종류: 수정=patch, 새 능력=minor, 대체 없는 제거=major.
-Soloforce2는 태그를 고정(pin)해 가져갑니다 — [연동 가이드](./docs/soloforce2-integration.md).
+## 설치 범위
+
+플러그인 선언은 `.claude-plugin/plugin.json`에 있으며 `skills/ingestiger`만 노출합니다. 범용 스킬 설치에서는 해당 폴더를 `references/`와 함께 복사합니다. Claude Code 실제 설치 검증은 아직 수행하지 않았습니다. 원격 저장소에 이 제안판을 올리기 전에는 GitHub 설치가 새 판을 제공하지 않습니다.
+
+실제 기업의 원본과 Wiki는 플러그인 저장소 밖의 지정 작업공간에 저장합니다.
+
+## 스크립트와 LLM
+
+[실행 분담](skills/ingestiger/references/execution.md) · [운영 명령](skills/ingestiger/references/runbook.md): XLSX 구조 추출·LLM 요청 준비·응답 검증·후보 목차 생성을 스크립트로 실행한다. 니즈 의미 분석은 호스트 LLM을 사용한다. Graphify는 설계 참고이며 아직 연동하지 않았다.
+
+[Golden sample 시작 절차](skills/ingestiger/references/golden-samples.md): 이미지는 원본과 최소 정보만 보관하고 필요할 때 참조한다.
+
+[대용량 발표자료 처리](skills/ingestiger/references/large-decks.md): Keynote/PPTX 컨테이너·매체 구성을 먼저 확인하고 슬라이드 단위로 읽는다.
