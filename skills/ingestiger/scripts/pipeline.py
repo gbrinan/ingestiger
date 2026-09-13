@@ -17,7 +17,11 @@ Each entry in needs is a knowledge candidate, with kind ({kinds}), title, statem
 patterns (list), evidence (nonempty exact quotes from THIS unit), and
 claim_status=source_reported. Preserve numbers, exceptions, shot/camera differences,
 human action and environmental prerequisites. Preserve stated effective dates and
-applicability in details; a collection date is not an effective date or approval.
+applicability in each candidate's details when they govern that candidate, even
+if the date is also a separate candidate. A collection date is not an effective
+date or approval. Write title, statement and details in the source unit's primary
+language; keep evidence verbatim. Undecided assignments are unresolved questions
+or unknowns, not confirmed decisions.
 Separate source facts from relationship or value judgments; do not perform broad
 relationship analysis unless requested. Reading every supplied unit does not prove
 that conditions elsewhere in the document were checked. Split distinct needs by meaning;
