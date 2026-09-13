@@ -151,3 +151,9 @@ packet에는 기준 snapshot·시점, 적용 기간, 필수 조건과 확인 범
 7. 실패 시 이전 current를 유지하고 실패 기록을 남긴다. 성공하면 이전 revision을 보존한다. 외부 산출물은 자동 수정 대신 stale 상태와 영향 근거를 남길 수 있다.
 
 파일 삭제/누락은 원본 폐기나 지식 철회 승인이 아니다. 삭제 후보를 등록하고 확인할 때까지 출처 이용 불가와 영향을 표시한다. 정본 은퇴 시 tombstone/redirect를 남겨 기존 링크의 의미를 보존한다.
+
+## 단일 후보 정본 구현 범위
+
+`knowledge.py`는 호스트가 검증한 후보와 인간 검토를 받아 완성 snapshot의 파일들을 구성한다. 지식 Markdown의 JSON frontmatter가 값의 정본이며 본문은 같은 파일 안의 읽기용 표현이다. host가 발급한 K-UUID는 내용 변경과 독립적이며 기존 ID를 선택하면 revision을 증가시킨다. current는 제공 판 선택을 뜻하고 claim_status는 source_reported를 유지한다. 기간은 unknown, 조건 확인은 선택 단위의 인간 검토, 미판독 의존 조건은 unverified다. 관계 파일은 not_evaluated이며 자동 관계 대조를 했다는 뜻이 아니다.
+
+호스트는 프로젝트별 snapshots/<manifest-sha256>/ 아래 파일 묶음을 보존하고 current.json으로 하나를 선택한다. 검토 기록은 후보의 작업·응답 해시·단위·순번·기준 snapshot과 결합한다. 보류/반려/모호한 단위는 반영할 수 없고 더 최신 검토가 있으면 이전 수용 결정의 미반영 쓰기를 거부한다. 과거 snapshot과 검토 기록은 유지한다. 이 단일 후보 구현은 원본 삭제·지식 은퇴·다중 관계 갱신·승인 업무·Drive 전달을 구현하지 않는다.

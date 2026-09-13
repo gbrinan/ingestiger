@@ -10,11 +10,12 @@
 | 링크 검사 | scripts/link_audit.py | URL 유형·셀 텍스트 분리. 네트워크는 호출하지 않음 |
 | KEY/PPTX 구조 목록 | scripts/deck_inventory.py | 컨테이너/매체 목록, PPTX 순서. Keynote 실제 슬라이드 변환 미구현 |
 | 이미지 샘플 저장 | scripts/golden.py | 원본·최소 정보·해시·참조. 등록 시 OCR/의미 분석 없음 |
-| 의미 분해 | 호스트 LLM | requests를 읽고 스키마에 맞는 response 작성. 자동 API 호출 없음 |
+| 의미 분해 | 호스트 LLM | 공용 코어에는 API 호출 없음. Soloforce2 호스트는 선택 요청 하나를 기존 Claude 로그인으로 실행하고 도구 없는 JSON 응답을 검사하는 경로를 제공 |
 | 구조 단위 요청의 분량 관리 | scripts/pipeline.py prepare | 본문 문자·전체 JSON UTF-8 바이트 함께 제한. 큰 단위는 오류 또는 명시적 보류. 모델 토큰 수 미측정 |
 | 후보 저장 | scripts/pipeline.py build | 단위 정산·인용·허용 필드 검증 후 새 후보 디렉터리. 선택 kind 지원. current 갱신 없음 |
-| 의미 검토·동일성·관계 대조 | 호스트 LLM/검토자 | 계약에 따라 수행. 자동 검토 강제/정본 승격 엔진 미구현 |
-| 정본 갱신·뷰·맥락·변경 영향 | 호스트가 계약에 따라 구성 | 안정 ID 대조·writer lock·원자적 current 전환·자동 뷰 재생성 엔진 미구현 |
+| 의미 검토·동일성·관계 대조 | 호스트 검토자 | 단일 후보의 수용/보류/반려 및 기존 ID 선택을 호스트가 기록. 자동 의미 보증·관계 대조는 미구현 |
+| 단일 후보 정본 구성 | scripts/knowledge.py compose | 기존 ID의 새 판 또는 호스트 발급 ID로 Markdown·검토 JSON·목차·manifest 생성. 모델 호출·파일 I/O 없음 |
+| 정본 갱신·조회 | Soloforce2 호스트 | writer lock, base snapshot·원본 재검사, journal, 파일 readback 후 current 교체와 ID 조회 구현. Windows 실기기·정전 내구성 미검증. 관계·영향·자동 뷰 엔진 미구현 |
 | 필수 적용 조건·기간 확인 | 호스트가 허용된 Wiki와 적용 근거를 확인 | 독립 조건 조회 엔진 미구현. 구조 단위 complete만으로 전체 조건 확인 불가 |
 | 작업 전달·실제 사용 기록 | 호스트의 작업·산출물 근거 | provided/applied_verified 저장·영향 추적 엔진 미구현 |
 | 로컬 + Drive 전달 | 승인된 호스트 저장 도구 | 파일별 readback은 호스트가 수행. 자동 동기화·재시도·충돌 해결 미구현 |

@@ -59,3 +59,7 @@ python3 scripts/golden.py packet /approved/project/golden/GS001 reference-pointe
 ```
 
 사용자가 광고용으로 확인한 경우에만 register에 `--channel sns-ad`를 덧붙인다. 생략·재등록·판 변경은 [이미지 저장 계약](golden-samples.md)을 따른다. Windows에서는 `python -X utf8`과 승인된 Windows 경로를 사용한다.
+
+## 검토된 후보의 정본 구성
+
+`knowledge.py`의 `compose(previous, candidate, review)`는 검증된 입력에서 파일 문자열과 manifest 해시를 반환하는 공용 함수다. 독립 CLI로 current를 쓰지 않는다. Soloforce2는 `/api/wiki/reviews`에서 인간 결정을 기록하고 `/api/wiki/commit`에서 원본·기준 판을 재검사한 뒤 잠금 아래 반영한다. `/api/wiki/knowledge/:id`에서 같은 ID·판·조건·근거를 재조회한다. 실행·복구 절차는 호스트 운영 문서를 따른다.

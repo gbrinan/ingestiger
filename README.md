@@ -6,7 +6,7 @@
 
 여러 기업의 비슷한 업무도 허용된 접근 범위 안에서 패턴별로 묶어 읽습니다. 각 기업의 세부 조건과 근거는 유지합니다. Wiki와 별도로 [ASCII ERD와 짧은 구성 요약](skills/ingestiger/references/structure.md)을 만듭니다.
 
-현재는 **후보 생성까지 실행 가능한 개편판**입니다. 제공 기능과 미구현·미검증 범위는 [어댑터 상태](skills/ingestiger/references/adapters.md)에서 확인합니다.
+현재는 **후보 생성과 검토된 단일 후보의 정본 파일 구성을 제공하는 개편판**입니다. `knowledge.py`는 안정 ID·판·근거·검토 기록을 가진 snapshot 파일을 만들며, 권한 확인·잠금·current 전환·모델 실행은 호스트가 담당합니다. 제공 기능과 미구현·미검증 범위는 [어댑터 상태](skills/ingestiger/references/adapters.md)에서 확인합니다.
 
 - [개편 제안과 구현 순서](docs/proposal.md)
 - [역할 지시서](agent/role-directive.md)
