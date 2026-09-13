@@ -11,6 +11,7 @@
 | KEY/PPTX 구조 목록 | scripts/deck_inventory.py | 컨테이너/매체 목록, PPTX 순서. Keynote 실제 슬라이드 변환 미구현 |
 | 이미지 샘플 저장 | scripts/golden.py | 원본·최소 정보·해시·참조. 등록 시 OCR/의미 분석 없음 |
 | 의미 분해 | 호스트 LLM | requests를 읽고 스키마에 맞는 response 작성. 자동 API 호출 없음 |
+| 구조 단위 요청의 분량 관리 | scripts/pipeline.py prepare | 본문 문자·전체 JSON UTF-8 바이트 함께 제한. 큰 단위는 오류 또는 명시적 보류. 모델 토큰 수 미측정 |
 | 후보 저장 | scripts/pipeline.py build | 단위 정산·인용·허용 필드 검증 후 새 후보 디렉터리. 선택 kind 지원. current 갱신 없음 |
 | 의미 검토·동일성·관계 대조 | 호스트 LLM/검토자 | 계약에 따라 수행. 자동 검토 강제/정본 승격 엔진 미구현 |
 | 정본 갱신·뷰·맥락·변경 영향 | 호스트가 계약에 따라 구성 | 안정 ID 대조·writer lock·원자적 current 전환·자동 뷰 재생성 엔진 미구현 |

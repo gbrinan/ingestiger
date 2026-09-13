@@ -16,6 +16,8 @@ python3 scripts/pipeline.py build request.json response.json fresh-candidate-dir
 2. `scoped-units.json`은 추출물 중 **소유 기업/프로젝트가 확정된 구조 단위**다. 여러 기업이 한 파일에 있으면 분리한 뒤 prepare한다. LLM이 범위를 추론했으면 후보 상태를 표시하고 호스트의 허용 범위와 대조한다. 원문 전체 정산에서 제외한 단위·헤더·이미지도 별도로 남긴다.
 3. 각 unit은 `unit_id, locator, text`를 가진다. 파일에는 `source_id, source_revision, org_id, project_id, units`가 필요하다. `structure`에는 단위를 이해하는 데 필요한 헤더 값·병합 anchor·부서 문맥을 명시한다. 자동 추출만으로 이 의미 문맥이 완성되지는 않는다.
 4. prepare는 `requests` 배열을 만든다. 호스트 에이전트가 **각 요청을 LLM으로 읽고** `request_id, results` 응답을 작성한다. 기존 에이전트 LLM을 사용하므로 별도 API 키가 필요 없다. 이 CLI 자체에는 모델 API 호출/자동 재시도 기능이 없다. 응답 형식은 요청의 prompt를 따르고 필드 의미·선택 kind·이전 응답 호환성은 [후보 계약](contracts.md#현재-후보-응답-계약)을 따른다.
+
+요청 전체 바이트 한도는 `--max-bytes 98304`로 지정한다. 큰 구조 단위를 제외하고 나머지부터 진행할 때만 `--defer-oversized`를 추가하고 결과의 `pending_units`를 처리 장부에 남긴다. requests만 복사하고 보류 목록을 버리면 전체 완료로 보고할 수 없다. LLM에는 요청 객체를 compact JSON으로 전달하며, 실제 모델의 토큰 한도와 추가 시스템 문맥은 호스트에서 별도로 확인한다.
 5. build는 요청 ID, 전체 단위 정산, 중복, 인용문 실제 존재와 주장 상태를 검사한 뒤 후보 JSON과 참조 목차를 만든다. 실패는 현재 Wiki를 바꾸지 않는다. 후보 ID는 배치 내 ID이며 기존 Wiki의 안정 ID와 같다고 간주하지 않는다.
 6. 의미 검토 후 기존 정본 ID와 대조해 승인된 변경 범위만 반영한다. build 출력 이후의 호스트 작업과 자동화 여부는 어댑터 상태를 확인한다.
 

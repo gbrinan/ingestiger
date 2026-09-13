@@ -63,16 +63,11 @@ def extract_xlsx(path, source_id, org, project):
     if path.read_bytes() != original: raise ValueError('Source changed during extraction')
     return {'schema_version':VERSION,'source_id':source_id,'source_revision':hashlib.sha256(original).hexdigest(), 'org_id':org,'project_id':project,'sheets':sheets,'units':units,'pending_media':media,'status':'text_extracted','note':'No image interpretation, formula calculation, or semantic completion'}
 
-def prepare(source, model, max_chars):
+def prepare(source, model, max_chars, max_bytes=98304, defer_oversized=False):
     if max_chars < 1: raise ValueError('max_chars must be positive')
+    if not isinstance(max_bytes, int) or max_bytes < 1: raise ValueError('max_bytes must be positive')
     units = source['units']; ids = [u['unit_id'] for u in units]
     if len(ids) != len(set(ids)): raise ValueError('Duplicate unit IDs')
-    batches = []; batch = []; size = 0
-    for unit in units:
-        if len(unit['text']) > max_chars: raise ValueError('Oversized unit requires explicit subdivision: '+unit['unit_id'])
-        if batch and size+len(unit['text']) > max_chars: batches.append(batch); batch=[];size=0
-        batch.append(unit);size+=len(unit['text'])
-    if batch: batches.append(batch)
     references=source.get('reference_samples',[])
     keys=[]
     for ref in references:
@@ -84,8 +79,7 @@ def prepare(source, model, max_chars):
             raise ValueError('Stale reference image')
         keys.append(ref['sample_id'])
     if len(keys)!=len(set(keys)):raise ValueError('Duplicate references')
-    requests=[]
-    for batch in batches:
+    def make_request(batch):
         request = {k:source[k] for k in ['source_id','source_revision','org_id','project_id']}
         # Structural headers and merged anchors must accompany cell batches.
         request.update(schema_version=VERSION,model=model,prompt=PROMPT,units=batch,structure=source.get('structure',source.get('sheets',[])))
@@ -95,8 +89,27 @@ def prepare(source, model, max_chars):
         if references:
             request['reference_samples']=references
             request['prompt']+='\n'+REFERENCE_PROMPT
-        request['request_id']=digest(request);requests.append(request)
-    return {'schema_version':VERSION,'requests':requests,'unit_count':len(units),'pending_media':source.get('pending_media',[])}
+        request['request_id']=digest(request)
+        return request
+    def byte_size(request):
+        # Compact UTF-8 JSON includes prompt, structure, cell arrays, references and ID.
+        # This is a transport bound, not a claim about an unknown model's tokenizer.
+        return len(json.dumps(request,ensure_ascii=False,separators=(',',':')).encode('utf-8'))
+    if byte_size(make_request([])) > max_bytes: raise ValueError('Request metadata exceeds byte budget')
+    requests=[]; pending=[]; batch=[]; size=0
+    for unit in units:
+        reason = 'source_unit_exceeds_character_budget' if len(unit['text']) > max_chars else 'source_unit_exceeds_request_byte_budget' if byte_size(make_request([unit])) > max_bytes else None
+        if reason:
+            if not defer_oversized: raise ValueError('Oversized unit requires explicit subdivision: '+unit['unit_id'])
+            pending.append({'unit_id':unit['unit_id'],'reason':reason})
+            continue
+        if batch and (size+len(unit['text']) > max_chars or byte_size(make_request(batch+[unit])) > max_bytes):
+            requests.append(make_request(batch));batch=[];size=0
+        batch.append(unit);size+=len(unit['text'])
+    if batch:requests.append(make_request(batch))
+    return {'schema_version':VERSION,'requests':requests,'unit_count':len(units),'pending_media':source.get('pending_media',[]),
+            'pending_units':pending,'request_bytes':[byte_size(request) for request in requests],
+            'budget':{'max_characters':max_chars,'max_utf8_bytes':max_bytes,'token_count':'not_measured'}}
 
 def validate(request, response):
     if digest({k:v for k,v in request.items() if k!='request_id'}) != request['request_id']:
@@ -168,10 +181,10 @@ def build(request, response, output):
 def main():
     p=argparse.ArgumentParser(description=__doc__);sub=p.add_subparsers(dest='cmd',required=True)
     x=sub.add_parser('extract-xlsx');x.add_argument('input');x.add_argument('output');x.add_argument('--source-id',required=True);x.add_argument('--org',required=True);x.add_argument('--project',required=True)
-    x=sub.add_parser('prepare');x.add_argument('input');x.add_argument('output');x.add_argument('--model',required=True);x.add_argument('--max-chars',type=int,default=12000)
+    x=sub.add_parser('prepare');x.add_argument('input');x.add_argument('output');x.add_argument('--model',required=True);x.add_argument('--max-chars',type=int,default=12000);x.add_argument('--max-bytes',type=int,default=98304);x.add_argument('--defer-oversized',action='store_true')
     x=sub.add_parser('build');x.add_argument('request');x.add_argument('response');x.add_argument('output')
     a=p.parse_args()
     if a.cmd=='extract-xlsx':dump(a.output,extract_xlsx(a.input,a.source_id,a.org,a.project))
-    elif a.cmd=='prepare':dump(a.output,prepare(json.loads(Path(a.input).read_text(encoding='utf-8')),a.model,a.max_chars))
+    elif a.cmd=='prepare':dump(a.output,prepare(json.loads(Path(a.input).read_text(encoding='utf-8')),a.model,a.max_chars,a.max_bytes,a.defer_oversized))
     else:build(json.loads(Path(a.request).read_text(encoding='utf-8')),json.loads(Path(a.response).read_text(encoding='utf-8')),a.output)
 if __name__=='__main__':main()
