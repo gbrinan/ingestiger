@@ -16,7 +16,11 @@ one result with unit_id, status (analyzed or ambiguous), and needs (possibly emp
 Each entry in needs is a knowledge candidate, with kind ({kinds}), title, statement, details (list of strings), departments (list),
 patterns (list), evidence (nonempty exact quotes from THIS unit), and
 claim_status=source_reported. Preserve numbers, exceptions, shot/camera differences,
-human action and environmental prerequisites. Split distinct needs by meaning;
+human action and environmental prerequisites. Preserve stated effective dates and
+applicability in details; a collection date is not an effective date or approval.
+Separate source facts from relationship or value judgments; do not perform broad
+relationship analysis unless requested. Reading every supplied unit does not prove
+that conditions elsewhere in the document were checked. Split distinct needs by meaning;
 do not merge companies or infer approval. Unsupported fields stay unknown in prose.
 A URL or local path is not evidence of the unseen artifact. Analyze only supplied
 cell text; never infer linked content. Access failure does not mean a false claim.

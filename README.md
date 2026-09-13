@@ -14,7 +14,7 @@
 - [기존 연동에서 전환하기](docs/soloforce2-integration.md)
 - [구조 결정](.agents/adr/0001-wiki-plugin.md)
 
-저장 대상은 로컬 + Google Drive다. [두 저장소 계약](skills/ingestiger/references/storage.md)과 [기본 실행/Soloforce2 연동 설계](docs/soloforce2-integration.md)를 제공한다. 호스트별 구현·검증 상태는 해당 연동 기록을 확인한다.
+저장이 포함된 작업의 기본 대상은 로컬 + Google Drive다. 일반 조회는 근거·사용한 판·미확인 범위의 반환으로 완료한다. 후보 저장·정본 반영·원격 전달은 각각 확인한다. [두 저장소 계약](skills/ingestiger/references/storage.md)과 [기본 실행/Soloforce2 연동 설계](docs/soloforce2-integration.md)를 제공하며 호스트별 구현·검증 상태는 해당 연동 기록을 확인한다.
 
 ## 사용 예
 
@@ -29,6 +29,8 @@
 플러그인 선언은 `.claude-plugin/plugin.json`에 있으며 `skills/ingestiger`만 노출합니다. 범용 스킬 설치에서는 해당 폴더를 `references/`와 함께 복사합니다. Claude Code 실제 설치 검증은 아직 수행하지 않았습니다. 원격 저장소에 이 제안판을 올리기 전에는 GitHub 설치가 새 판을 제공하지 않습니다.
 
 실제 기업의 원본과 Wiki는 플러그인 저장소 밖의 지정 작업공간에 저장합니다.
+
+직원 역할을 사용하는 호스트는 역할 원본을 별도로 등록하고, 실행 사본에서도 스킬 링크를 열 수 있게 연결해야 합니다. 플러그인 설치나 파일 해시 일치만으로 직원 역할 적용을 완료 처리하지 않습니다. 후보 생성의 `pipeline.py` 프롬프트는 단위 분석과 응답 형식에 한정되며 전체 Wiki 관리 역할을 자동 실행하지 않습니다.
 
 ## 역할·절차·코드의 정본
 
