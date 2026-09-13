@@ -1,5 +1,7 @@
 # IngesTiger LLM Wiki 개편 제안
 
+이 문서는 개편 당시 설계·실험 이력이다. 현재 실행 절차는 [스킬](../skills/ingestiger/SKILL.md), 구현 상태는 [어댑터 상태](../skills/ingestiger/references/adapters.md)를 따른다.
+
 ## 풀 문제와 선택
 
 많은 문서를 한 번에 읽어 요약하는 것만으로는 기업의 업무 맥락이 유지되지 않는다. 파일 하나에는 여러 부서의 요구와 서로 다른 시점의 결정이 섞이고, 같은 요구가 다른 표 구조로 반복된다. 문서를 추가할 때마다 전체 요약을 다시 쓰면 누락, 의미 병합, 오래된 결론의 잔존이 생긴다.
@@ -137,7 +139,7 @@ Wiki 생성 결과에는 별도 STRUCTURE.md를 포함한다. 논리 ASCII ERD, 
 
 ## 실행 분담 구현
 
-현재 구현 범위와 Graphify의 선택적 위치는 [실행 계약](../skills/ingestiger/references/execution.md)에 둔다. 스킬 내부 `scripts/pipeline.py`를 배포하여 호스트 LLM과 파일 요청/응답으로 연결한다. 의미 판단을 정규식으로 대체하지 않는다.
+현재 구현 범위와 Graphify의 선택적 위치는 [어댑터 상태](../skills/ingestiger/references/adapters.md)에 둔다. 스킬 내부 `scripts/pipeline.py`를 배포하여 호스트 LLM과 파일 요청/응답으로 연결한다. 의미 판단을 정규식으로 대체하지 않는다.
 
 ## 이미지 샘플과 큰 발표자료
 
@@ -145,7 +147,7 @@ Wiki 생성 결과에는 별도 STRUCTURE.md를 포함한다. 논리 ASCII ERD, 
 
 추가한 [원본 품질 계약](../skills/ingestiger/references/source-quality.md)은 HWP/HWPX 등 예외의 처리 상태를 명시한다. sanitized Sheets용 링크 감사 CLI를 구현했으며 네트워크 자동 검사와 HWP/HWPX는 원본의 Kordoc을 기본 어댑터로 지정했으며 실제 연결·변환은 아직 검증하지 않았다.
 
-전체 상위 과정은 [실행 계약](../skills/ingestiger/references/execution.md)의 가져오기 → 분해하기 → 저장하기를 따른다. 개별 스크립트와 통합 자동 실행기의 구현 상태를 구분한다.
+전체 상위 과정은 [실행 계약](../skills/ingestiger/SKILL.md)의 가져오기 → 분해하기 → 저장하기를 따른다. 개별 스크립트와 통합 자동 실행기의 구현 상태를 구분한다.
 
 ## 현재 지침의 시작점
 

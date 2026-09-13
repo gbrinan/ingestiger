@@ -7,6 +7,22 @@ s=importlib.util.spec_from_file_location('link_audit',BASE/'link_audit.py')
 m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
 
 class AuditTests(unittest.TestCase):
+    def test_first_rows_and_sheet_name_do_not_imply_role(self):
+        source={'spreadsheet_id':'fixture','sheets':[{'title':'강사예시','cells':[
+            {'cell':f'A{row}','value':{'stringValue':'실제 고객 요구 https://example.org'}} for row in (1,2,3)]}]}
+        result=m.audit(source)
+        self.assertEqual({u['role'] for u in result['units']},{'unknown'})
+        self.assertEqual({u['role'] for u in result['links']},{'unknown'})
+    def test_explicit_cell_role_overrides_sheet_role(self):
+        source={'spreadsheet_id':'fixture','sheets':[{'title':'자료','role':'participant_material','cells':[
+            {'cell':'A1','value':{'stringValue':'요청'}},
+            {'cell':'A2','role':'header_or_example','value':{'stringValue':'예시'}}]}]}
+        result=m.audit(source)
+        self.assertEqual([u['role'] for u in result['units']],['participant_material','header_or_example'])
+        source['sheets'][0]['cells'][1]['role']='instructor_reference'
+        self.assertNotEqual(m.audit(source)['source_revision'],result['source_revision'])
+        source['sheets'][0]['role']='invented'
+        with self.assertRaises(ValueError):m.audit(source)
     def run_audit(self,cells):
         return m.audit({'spreadsheet_id':'fixture','sheets':[{'title':'lesson','cells':cells}]})
     def test_url_not_local_and_link_only_not_evidence(self):

@@ -1,6 +1,6 @@
 # IngesTiger 기여 지침
 
-역할은 [역할 지시서](agent/role-directive.md), 실행 절차는 [스킬](skills/ingestiger/SKILL.md), 데이터 의미는 [계약](skills/ingestiger/references/contracts.md)이 관리한다. 사용자 안내는 README에 둔다. 현재 개발 상태와 미검증 범위는 [제안서](docs/proposal.md)를 읽는다.
+역할은 [역할 지시서](agent/role-directive.md), 실행 절차는 [스킬](skills/ingestiger/SKILL.md), 데이터 의미는 [계약](skills/ingestiger/references/contracts.md)이 관리한다. 사용자 안내는 README에 둔다. 현재 구현·미검증 범위는 [어댑터 상태](skills/ingestiger/references/adapters.md), 설계와 실험 이력은 [제안서](docs/proposal.md)를 읽는다.
 
 `skills/`에는 배포할 스킬만 둔다. 런타임 참조는 각 스킬 폴더 내부에 묶는다. `archive/`는 과거 증거이며 현재 실행 지침이 아니다. 실제 기업 자료, 추출물, 테스트 결과는 이 저장소 바깥에서 관리한다.
 

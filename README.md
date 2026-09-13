@@ -6,7 +6,7 @@
 
 여러 기업의 비슷한 업무도 허용된 접근 범위 안에서 패턴별로 묶어 읽습니다. 각 기업의 세부 조건과 근거는 유지합니다. Wiki와 별도로 [ASCII ERD와 짧은 구성 요약](skills/ingestiger/references/structure.md)을 만듭니다.
 
-현재는 **개편 제안판**입니다. 실행 지침과 데이터 계약, 플러그인 폴더 구성을 제공합니다. 대량 자동 변환, 갱신 엔진, 다중 사용자 권한관리의 구현 완료를 뜻하지 않습니다.
+현재는 **후보 생성까지 실행 가능한 개편판**입니다. 제공 기능과 미구현·미검증 범위는 [어댑터 상태](skills/ingestiger/references/adapters.md)에서 확인합니다.
 
 - [개편 제안과 구현 순서](docs/proposal.md)
 - [역할 지시서](agent/role-directive.md)
@@ -14,7 +14,7 @@
 - [기존 연동에서 전환하기](docs/soloforce2-integration.md)
 - [구조 결정](.agents/adr/0001-wiki-plugin.md)
 
-저장 대상은 로컬 + Google Drive다. [두 저장소 계약](skills/ingestiger/references/storage.md)과 [기본 실행/Soloforce2 연동 설계](docs/soloforce2-integration.md)를 제공한다. Drive 쓰기·동기화와 호스트 통합은 아직 설계 단계다.
+저장 대상은 로컬 + Google Drive다. [두 저장소 계약](skills/ingestiger/references/storage.md)과 [기본 실행/Soloforce2 연동 설계](docs/soloforce2-integration.md)를 제공한다. 호스트별 구현·검증 상태는 해당 연동 기록을 확인한다.
 
 ## 사용 예
 
@@ -30,9 +30,19 @@
 
 실제 기업의 원본과 Wiki는 플러그인 저장소 밖의 지정 작업공간에 저장합니다.
 
+## 역할·절차·코드의 정본
+
+- 역할과 판단 경계: [role-directive.md](agent/role-directive.md)
+- 작업 분기와 통과 조건: [SKILL.md](skills/ingestiger/SKILL.md)
+- 데이터와 의미 검토: [contracts.md](skills/ingestiger/references/contracts.md)
+- 전달 대상과 검증: [storage.md](skills/ingestiger/references/storage.md)
+- 실행 코드: [스킬 내부 scripts](skills/ingestiger/scripts)
+
+스킬은 하나이며 참조 문서는 9개입니다. 중복 실행·전달 문서는 [통합 전 원본](archive/contract-cleanup-dd10e868/README.md)에 보존했습니다. 활용 목적이 없어도 명시된 가져오기·갱신 요청은 그대로 수행합니다.
+
 ## 스크립트와 LLM
 
-[실행 분담](skills/ingestiger/references/execution.md) · [운영 명령](skills/ingestiger/references/runbook.md): XLSX 구조 추출·LLM 요청 준비·응답 검증·후보 목차 생성을 스크립트로 실행한다. 니즈 의미 분석은 호스트 LLM을 사용한다. Graphify는 설계 참고이며 아직 연동하지 않았다.
+[실행 분담](skills/ingestiger/SKILL.md) · [운영 명령](skills/ingestiger/references/runbook.md): XLSX 구조 추출·LLM 요청 준비·응답 검증·후보 목차 생성을 스크립트로 실행한다. 니즈 의미 분석은 호스트 LLM을 사용한다. Graphify는 설계 참고이며 아직 연동하지 않았다.
 
 [Golden sample 시작 절차](skills/ingestiger/references/golden-samples.md): 이미지는 원본과 최소 정보만 보관하고 필요할 때 참조한다.
 
